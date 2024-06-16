@@ -32,6 +32,7 @@ DEBUG = "True" if str(os.environ.get("DEBUG")).lower() == "true" else "False"
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = "users.User"
 
 # Application definition
 
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     "rest_framework",
 
     'tasks',
+    'users',
 ]
 
 MIDDLEWARE = [
