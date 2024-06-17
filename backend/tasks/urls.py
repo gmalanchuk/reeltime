@@ -6,6 +6,7 @@ from tasks import views
 
 router = DefaultRouter()
 router.register(prefix="boards", viewset=views.BoardViewSet, basename="board")
+router.register(prefix="columns", viewset=views.ColumnViewSet, basename="columns")
 
 
 urlpatterns = [
