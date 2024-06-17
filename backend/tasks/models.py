@@ -11,10 +11,9 @@ class AbsTimeStampModel(models.Model):
 
 class Board(AbsTimeStampModel):
     name = models.CharField(max_length=100)
-    description = models.TextField(null=True, blank=True)
-    user = models.ForeignKey(to="users.User", on_delete=models.CASCADE, related_name="boards", verbose_name="Board owner")
+    description = models.CharField(max_length=512, null=True, blank=True)
+    owner = models.ForeignKey(to="users.User", on_delete=models.CASCADE, related_name="boards")
     # TODO users = пользователи, у которых есть доступ к этой доске (могут создавать, редактировать таски, колонки)
-    # TODO тоесть админ может редактировать, удалять и тд колонки, какой-то ещё юзер может только создавать таски, другой юзер может только просматривать и перетягивать таски
 
     def __str__(self):
         return f"ID: {self.pk} | Name: {self.name}"
@@ -22,8 +21,23 @@ class Board(AbsTimeStampModel):
 
 class Column(AbsTimeStampModel):
     name = models.CharField(max_length=100)
+    description = models.CharField(max_length=256, null=True, blank=True)
     board = models.ForeignKey(to=Board, on_delete=models.CASCADE, related_name="columns")
-    user = models.ForeignKey(to="users.User", on_delete=models.CASCADE, related_name="columns", verbose_name="Column owner")
+    owner = models.ForeignKey(to="users.User", on_delete=models.CASCADE, related_name="columns")
 
     def __str__(self):
         return f"ID: {self.pk} | Name: {self.name}"
+
+
+class Task(AbsTimeStampModel):
+    description = models.CharField(max_length=2048)
+    column = models.ForeignKey(to=Column, on_delete=models.CASCADE, related_name="tasks")
+    owner = models.ForeignKey(to="users.User", on_delete=models.CASCADE, related_name="tasks")
+    executor = models.ForeignKey(to="users.User", on_delete=models.CASCADE, related_name="tasks_executor", null=True, blank=True)
+    # deadline
+    # priority = choices (low, medium, high)
+    # tags
+    # story points = choices (1, 2, 3, 5, 8, 13, 21)
+
+    def __str__(self):
+        return f"ID: {self.pk} | Description: {self.description[:15]}..."
