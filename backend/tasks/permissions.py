@@ -3,7 +3,7 @@ from rest_framework.permissions import BasePermission
 from tasks.models import Board
 
 
-class IsOwnerOrAdmin(BasePermission):
+class IsOwnerOrAdminPermission(BasePermission):
     def has_permission(self, request, view, board: Board = None):
         # if user is an admin - return True
         if request.user.is_superuser:
@@ -28,7 +28,7 @@ class CanDragTasksPermission(BasePermission):
         board = view.get_object().column.board
 
         # if user is an admin or board owner - return True
-        if IsOwnerOrAdmin().has_permission(request, view, board=board):
+        if IsOwnerOrAdminPermission().has_permission(request, view, board=board):
             return True
 
         # if user is a board member and has the right to drag tasks - return True

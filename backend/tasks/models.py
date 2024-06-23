@@ -50,7 +50,7 @@ class BoardMemberRelation(AbsTimeStampModel):
     role = models.ForeignKey(to="Role", on_delete=models.CASCADE, related_name="board_users")
 
     def __str__(self):
-        return f"ID: {self.pk} | User: {self.user} | Board: {self.board} | Role: {self.role}"
+        return f"ID: {self.pk} | User: {self.user} | Board ID: {self.board.pk} | Role Name: {self.role.name}"
 
 
 class Role(AbsTimeStampModel):
@@ -63,8 +63,7 @@ class Role(AbsTimeStampModel):
 
     # USER (может только менять поле column_id у всех(не только своих) тасок)
     can_drag_tasks = models.BooleanField(default=False, verbose_name="Can drag tasks between columns")
-    # todo сейчас весь основной функционал написан. осталось сделать только, чтобы пользователь мог обновлять только column_id поле
-    # todo создать для этого новый сериализатор возможно
+
 
     # MODERATOR
     # can_manage_all_tasks = models.BooleanField(default=False, verbose_name="Can edit and delete all tasks")

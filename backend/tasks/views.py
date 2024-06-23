@@ -3,8 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from tasks.models import Board, Column, Task
-from tasks.permissions import IsOwnerOrAdmin, CanDragTasksPermission
-from tasks.serializers import BoardSerializer, ColumnSerializer, TaskSerializer
+from tasks.permissions import IsOwnerOrAdminPermission, CanDragTasksPermission
+from tasks.serializers import BoardSerializer, ColumnSerializer, TaskSerializer, TaskColumnFieldUpdateSerializer
 
 
 @extend_schema(tags=['Boards'])
@@ -16,7 +16,7 @@ class BoardViewSet(ModelViewSet):
         if self.action == 'create':
             return (IsAuthenticated(),)
         elif self.action == 'destroy':
-            return (IsOwnerOrAdmin(),)
+            return (IsOwnerOrAdminPermission(),)
         # elif self.action in ('update', 'partial_update'):
         #     return (IsCanUpdateBoard(),)
 
@@ -47,3 +47,16 @@ class TaskViewSet(ModelViewSet):
             return (CanDragTasksPermission(),)
 
         return super().get_permissions()
+
+    def get_serializer_class(self):
+        user = self.request.user
+        board = self.get_object().column.board
+
+        if self.action in ('update', 'partial_update'):
+            if user.is_superuser or board.owner == user:
+                return TaskSerializer
+            # elif todo если у пользователя есть определенное право, то он тоже может обновлять все поля
+            else:
+                return TaskColumnFieldUpdateSerializer
+
+        return super().get_serializer_class()

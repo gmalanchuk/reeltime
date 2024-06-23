@@ -25,3 +25,11 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ("id", "description", "column", "owner", "executor", "created_at", "updated_at")
+
+
+class TaskColumnFieldUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating the COLUMN field in the Task model"""
+
+    class Meta:
+        model = Task
+        fields = ("column",)
