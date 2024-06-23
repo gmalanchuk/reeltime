@@ -4,7 +4,8 @@ from rest_framework.viewsets import ModelViewSet
 
 from tasks.models import Board, Column, Task
 from tasks.permissions import IsOwnerOrAdminPermission, CanDragTasksPermission
-from tasks.serializers import BoardSerializer, ColumnSerializer, TaskSerializer, TaskColumnFieldUpdateSerializer
+from tasks.serializers import BoardSerializer, ColumnSerializer, TaskSerializer, TaskColumnFieldUpdateSerializer, \
+    TaskExecutorFieldUpdateSerializer
 
 
 @extend_schema(tags=['Boards'])
@@ -55,6 +56,8 @@ class TaskViewSet(ModelViewSet):
         if self.action in ('update', 'partial_update'):
             if user.is_superuser or board.owner == user:
                 return TaskSerializer
+            elif board.board_users.get(user=user).role.can_change_executor:
+                return TaskExecutorFieldUpdateSerializer
             # elif todo если у пользователя есть определенное право, то он тоже может обновлять все поля
             else:
                 return TaskColumnFieldUpdateSerializer

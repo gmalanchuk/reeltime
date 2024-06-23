@@ -33,3 +33,11 @@ class TaskColumnFieldUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ("column",)
+
+
+class TaskExecutorFieldUpdateSerializer(TaskColumnFieldUpdateSerializer):
+    """Serializer for updating the EXECUTOR or/and COLUMN field in the Task model"""
+
+    class Meta:
+        model = Task
+        fields = TaskColumnFieldUpdateSerializer.Meta.fields + ("executor",)
