@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from tasks.models import Board, Column, Task
-from tasks.permissions import IsOwnerOrAdmin, IsCanUpdateBoard
+from tasks.permissions import IsOwnerOrAdmin, CanDragTasksPermission
 from tasks.serializers import BoardSerializer, ColumnSerializer, TaskSerializer
 
 
@@ -17,8 +17,8 @@ class BoardViewSet(ModelViewSet):
             return (IsAuthenticated(),)
         elif self.action == 'destroy':
             return (IsOwnerOrAdmin(),)
-        elif self.action in ('update', 'partial_update'):
-            return (IsCanUpdateBoard(),)
+        # elif self.action in ('update', 'partial_update'):
+        #     return (IsCanUpdateBoard(),)
 
         return super().get_permissions()
 
@@ -41,5 +41,9 @@ class TaskViewSet(ModelViewSet):
 
     def get_permissions(self):  # TODO: DRY
         if self.action == 'create':
+            # написать кастомный пермишен, который проверяет, что пользователь состоит в board_users и что у него есть право на создание задачи
             return (IsAuthenticated(),)
+        elif self.action in ('update', 'partial_update'):
+            return (CanDragTasksPermission(),)
+
         return super().get_permissions()

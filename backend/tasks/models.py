@@ -61,16 +61,17 @@ class Role(AbsTimeStampModel):
 
     # GUEST. all fields are nullable. can only view the board and tasks
 
-    # USER
+    # USER (может только менять поле column_id у всех(не только своих) тасок)
     can_drag_tasks = models.BooleanField(default=False, verbose_name="Can drag tasks between columns")
-    can_manage_own_tasks = models.BooleanField(default=False, verbose_name="Can create, edit and delete only own tasks")
+    # todo сейчас весь основной функционал написан. осталось сделать только, чтобы пользователь мог обновлять только column_id поле
+    # todo создать для этого новый сериализатор возможно
 
     # MODERATOR
-    can_manage_all_tasks = models.BooleanField(default=False, verbose_name="Can edit and delete all tasks")
+    # can_manage_all_tasks = models.BooleanField(default=False, verbose_name="Can edit and delete all tasks")
 
     # ADMINISTRATOR
-    can_manage_columns = models.BooleanField(default=False, verbose_name="Can create, edit and delete all columns")
-    can_manage_board = models.BooleanField(default=False, verbose_name="Can edit board but not delete it")
+    # can_manage_columns = models.BooleanField(default=False, verbose_name="Can create, edit and delete all columns")
+    # can_manage_board = models.BooleanField(default=False, verbose_name="Can edit board but not delete it")\
 
     def __str__(self):
         return f"ID: {self.pk} | Name: {self.name}"
