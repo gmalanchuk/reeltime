@@ -21,8 +21,6 @@ class Role(AbsTimeStampModel):
     # USER (может только менять поле column_id у всех(не только своих) тасок)
     can_drag_tasks = models.BooleanField(default=False, verbose_name="Can drag tasks between columns")
     can_change_executor = models.BooleanField(default=False, verbose_name="Can change executor of the task")
-
-    # todo это поле
     can_create_tasks = models.BooleanField(default=False,
                                            verbose_name="Can create tasks. Can manage only own tasks(edit and delete)")
 

@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from tasks.models import Board, Column, Task
-from tasks.permissions import IsOwnerOrAdminPermission, CanDragTasksPermission
+from tasks.permissions import IsOwnerOrBoardAdminPermission, CanDragTasksPermission, CanCreateTaskPermission
 from tasks.serializers import BoardSerializer, ColumnSerializer, TaskSerializer, TaskColumnFieldUpdateSerializer, \
     TaskExecutorFieldUpdateSerializer
 
@@ -17,7 +17,7 @@ class BoardViewSet(ModelViewSet):
         if self.action == 'create':
             return (IsAuthenticated(),)
         elif self.action == 'destroy':
-            return (IsOwnerOrAdminPermission(),)
+            return (IsOwnerOrBoardAdminPermission(),)
         # elif self.action in ('update', 'partial_update'):
         #     return (IsCanUpdateBoard(),)
 
@@ -42,23 +42,23 @@ class TaskViewSet(ModelViewSet):
 
     def get_permissions(self):  # TODO: DRY
         if self.action == 'create':
-            # написать кастомный пермишен, который проверяет, что пользователь состоит в board_users и что у него есть право на создание задачи
-            return (IsAuthenticated(),)
+            return (CanCreateTaskPermission(),)
         elif self.action in ('update', 'partial_update'):
             return (CanDragTasksPermission(),)
+        # elif self.action == 'destroy':
+            # return (CanDeleteTaskPermission(),
 
         return super().get_permissions()
 
     def get_serializer_class(self):
-        user = self.request.user
-        board = self.get_object().column.board
-
         if self.action in ('update', 'partial_update'):
-            if user.is_superuser or board.owner == user:
+            user = self.request.user
+            board = self.get_object().column.board
+
+            if user.is_superuser or board.owner == user or self.get_object().owner == user:
                 return TaskSerializer
             elif board.board_users.get(user=user).role.can_change_executor:
                 return TaskExecutorFieldUpdateSerializer
-            # elif todo если у пользователя есть определенное право, то он тоже может обновлять все поля
             else:
                 return TaskColumnFieldUpdateSerializer
 
