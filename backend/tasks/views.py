@@ -3,9 +3,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from tasks.models import Board, Column, Task
-from tasks.permissions import IsOwnerOrBoardAdminPermission, CanDragTasksPermission, CanCreateTaskPermission
+from tasks.permissions import IsOwnerOrBoardAdminPermission, CanDragTasksPermission, CanCreateTaskPermission, \
+    CanDeleteTaskPermission
 from tasks.serializers import BoardSerializer, ColumnSerializer, TaskSerializer, TaskColumnFieldUpdateSerializer, \
     TaskExecutorFieldUpdateSerializer
+from tasks.serializers.task_serializer import TaskCreateSerializer
 
 
 @extend_schema(tags=['Boards'])
@@ -45,8 +47,8 @@ class TaskViewSet(ModelViewSet):
             return (CanCreateTaskPermission(),)
         elif self.action in ('update', 'partial_update'):
             return (CanDragTasksPermission(),)
-        # elif self.action == 'destroy':
-            # return (CanDeleteTaskPermission(),
+        elif self.action == 'destroy':
+            return (CanDeleteTaskPermission(),)
 
         return super().get_permissions()
 
@@ -55,11 +57,18 @@ class TaskViewSet(ModelViewSet):
             user = self.request.user
             board = self.get_object().column.board
 
-            if user.is_superuser or board.owner == user or self.get_object().owner == user:
+            if (user.is_superuser
+                    or board.owner == user
+                    or self.get_object().owner == user
+                    or board.board_users.get(user=user).role.can_manage_all_tasks
+            ):
                 return TaskSerializer
             elif board.board_users.get(user=user).role.can_change_executor:
                 return TaskExecutorFieldUpdateSerializer
             else:
                 return TaskColumnFieldUpdateSerializer
+
+        elif self.action == 'create':
+            return TaskCreateSerializer
 
         return super().get_serializer_class()

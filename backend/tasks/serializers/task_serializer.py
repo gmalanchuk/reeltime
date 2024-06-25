@@ -4,6 +4,13 @@ from tasks.models import Task
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ("id", "description", "column", "owner", "executor", "created_at", "updated_at")
+        read_only_fields = ("id", "owner", "created_at", "updated_at")
+
+
+class TaskCreateSerializer(TaskSerializer):
     owner = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:

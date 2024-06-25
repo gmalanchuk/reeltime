@@ -55,3 +55,22 @@ class CanCreateTaskPermission(BasePermission):
                 return True
 
         return False
+
+
+class CanDeleteTaskPermission(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        board = view.get_object().column.board
+
+        # if user is an admin or board owner - return True
+        if IsOwnerOrBoardAdminPermission().has_permission(request, view, board=board):
+            return True
+
+        # if user is a board member and has the right to manage all tasks - return True
+        if board.board_users.filter(user=user).exists():
+            if board.board_users.get(user=user).role.can_manage_all_tasks:
+                return True
+            elif view.get_object().owner == user:  # if user is a task owner - return True
+                return True
+
+        return False

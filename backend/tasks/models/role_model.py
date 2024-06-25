@@ -25,9 +25,12 @@ class Role(AbsTimeStampModel):
                                            verbose_name="Can create tasks. Can manage only own tasks(edit and delete)")
 
     # MODERATOR
-    # can_manage_all_tasks = models.BooleanField(default=False, verbose_name="Can edit and delete all tasks")
+    can_manage_all_tasks = models.BooleanField(default=False,
+                                               verbose_name="Can edit and delete all tasks(not only own)")
 
     # ADMINISTRATOR
+    # can_manage_board_users = models.BooleanField(default=False, verbose_name="Can manage board users")
+    # can_mange_user_roles = models.BooleanField(default=False, verbose_name="Can manage user roles")
     # can_manage_columns = models.BooleanField(default=False, verbose_name="Can create, edit and delete all columns")
     # can_manage_board = models.BooleanField(default=False, verbose_name="Can edit board but not delete it")\
 
